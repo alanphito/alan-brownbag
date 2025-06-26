@@ -8,8 +8,9 @@
 #include <atomic>
 #include <numeric>
 #include <limits>
+#include <fstream>
 
-std::mutex cout_mutex;// for print safely
+std::mutex cout_mutex;// for printing safely
 
 struct Task {//represents unit of work
   int id;
@@ -91,6 +92,15 @@ void simulate_mode(const std::string& label, int task_count, int fetch_time_ms, 
 
   std::cout << "Total time: " << total << " ms\n";
   std::cout << "Average latency: " << average_latency << " ms\n";
+
+  // CSV LOG
+  std::string sanitized_label = label;
+  for (char& c : sanitized_label)
+    if (c == ' ' || c == ',') c = '_';
+  std::ofstream out_file("latencies_" + sanitized_label + ".csv");
+  for (int i = 0; i < task_count; ++i)
+    out_file << i << "," << latencies[i] << "\n";
+  out_file.close();
 }
 
 
